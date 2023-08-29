@@ -8,7 +8,7 @@ classdef HighestCorr < mlnla.featurefilter.Base
     
     methods
         
-        function obj = HighestCorrFilter(numEdgesToKeep)
+        function obj = HighestCorr(numEdgesToKeep)
             obj.numEdgesToKeep = numEdgesToKeep;
         end
         
