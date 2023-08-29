@@ -1,4 +1,4 @@
-classdef Default < mlnla.traintestdatasplitter.Base
+classdef IgnoreGroups < mlnla.traintestdatasplitter.Base
     
     methods
 
