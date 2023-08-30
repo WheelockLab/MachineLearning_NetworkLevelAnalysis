@@ -82,9 +82,14 @@ classdef MLCrossVal
             
         end
         
+        function obj = set.testDataFraction(obj, val)
+            if val < 0 || val > 1
+                error('MLCrossVal error.testDataFraction property must be between 0 and 1');
+                
+            end
+            obj.testDataFraction = val;
+        end
         
     end
-    
-    
     
 end
