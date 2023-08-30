@@ -16,9 +16,9 @@ classdef MaintainGroups < mlnla.traintestdatasplitter.Base
             numGroupsInTest = round(testDataFraction * numGroups);
             numGroupsInTrain = numGroups - numGroupsInTest;
 
-            if numGroupsInTest == 0 || numGroupsInTest == numGroups
-                error(['Selection of test data size (%1.3f) results in either test or train set being empty',...
-                        '(test set: %i, train set: %i'], numTestData, numGroupsInTrain);
+            if (numGroupsInTest == 0) | (numGroupsInTest == numGroups)
+                warning(['Selection of test data fraction of (%1.3f) results in either test or train set being empty',...
+                        '(test set: %i groups, train set: %i groups'], testDataFraction, numGroupsInTest, numGroupsInTrain);
             end
 
             groupIdsInTest = randperm(numGroups, numGroupsInTest);
