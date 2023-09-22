@@ -1,23 +1,18 @@
 %test script to run ML Cross val
 
-%% Load HCP rest 1 data
-fcData = load('/data/wheelock/data1/datasets/HCP/HCP_965_10min_Gordon333_20220330/mat/HCP_965_10min_Gordon333_20220331_Rest1.mat');
-fcData = fcData.HCPRest1;
+%% FC data (random data generated here to demonstrate data sizes)
+numROIs = 333;
+numSubj = 965;
+numSibGroups = 400;
+fcData = rand(numROIs, numROIs, numSubj);
 
-
-%% Load IM Data and reorder fc data to match it
-load('/data/wheelock/data1/people/ecka/NLA/NetworkLevelAnalysis/support_files/Gordon_13nets_333parcels_on_MNI.mat');
-fcData = fcData(ROI_order, ROI_order, :);
+%Remove diagonal elements and flatten fc to lower diagonal
 flatFcData = mlnla.utils.reshapeSquareFcIntoFlattenedFc(fcData);
 
-
-%% Load HCP metadata
-hcpMetadata = readtable('/data/wheelock/data1/people/ecka/NLA/testdata/HCP_10min_trim.txt');
-subjectID = hcpMetadata.Subject;
-age = hcpMetadata.Age;
-famIdStrings = hcpMetadata.Family_ID;
-sibIds = hcpMetadata.sib_group;
-
+%% Covariates (random data generated here to demonstrate data sizes
+subjectID = 1:numSubj;
+age = ceil(rand(numSubj,1)*70);
+sibIds = ceil(rand(numSubj,1)*numSibGroups);
 
 %% Setup ML Crossval trainer
 
