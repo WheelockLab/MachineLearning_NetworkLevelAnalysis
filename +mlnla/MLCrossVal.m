@@ -65,35 +65,31 @@ classdef MLCrossVal
         
         function [outputAllReps, avgOutput] = executeNTimes(obj, fcData, behavior, groupIds, numRepetitions)
             
-            outputAllReps = struct();
-            avgOutput = struct();
-            
-            outputAllReps.MSE_SVR_linear = zeros(numRepetitions,1);
-            outputAllReps.MAE_SVR_linear = zeros(numRepetitions,1);
-            outputAllReps.r_SVR_linear = zeros(numRepetitions,1);
-            outputAllReps.CI_SVR_linear = zeros(numRepetitions,2);
-            outputAllReps.R2_SVR_linear = zeros(numRepetitions,1);
-            outputAllReps.behav_train_fit = cell(numRepetitions,1);
-            outputAllReps.inv_coef = cell(numRepetitions,1);
-            
+            resultObj = mlnla.MLRepeatedResult(numRepetitions);
+                        
             for repIdx = 1:numRepetitions
-                outputThisRep = obj.execute(fcData,behavior,groupIds);   
-                outputAllReps.MSE_SVR_linear(repIdx) = outputThisRep.MSE_SVR_linear;
-                outputAllReps.MAE_SVR_linear(repIdx) = outputThisRep.MAE_SVR_linear;
-                outputAllReps.r_SVR_linear(repIdx) = outputThisRep.r_SVR_linear;
-                outputAllReps.CI_SVR_linear(repIdx,:) = outputThisRep.CI_SVR_linear;
-                outputAllReps.R2_SVR_linear(repIdx) = outputThisRep.R2_SVR_linear;
-                outputAllReps.behav_train_fit{repIdx} = outputThisRep.behav_train_fit;
-                outputAllReps.inv_coef{repIdx} = outputThisRep.inv_coef;
+                outputThisRep = obj.execute(fcData,behavior,groupIds); 
+                resultObj.setOutputAtRepetitionIndex(outputThisRep, repIdx);
             end
             
-            avgOutput.MSE_SVR_linear = mean(outputAllReps.MSE_SVR_linear);
-            avgOutput.MAE_SVR_linear = mean(outputAllReps.MAE_SVR_linear);
-            avgOutput.r_SVR_linear = mean(outputAllReps.r_SVR_linear);
-            avgOutput.CI_SVR_linear = mean(outputAllReps.CI_SVR_linear,1);
-            avgOutput.R2_SVR_linear = mean(outputAllReps.R2_SVR_linear);
+            outputAllReps = resultObj.asStruct();
+            avgOutput = resultObj.avgAsStruct();            
             
+        end
+        
+        function [outputAllReps, avgOutput] = executeNTimesPermuted(obj, fcData, behavior, groupIds, numRepetitions,...
+                                                                    permuteBehavFlag, permuteNetPairsFlag)
+                                                    
+            resultObj = mlnla.MLRepeatedResult(numRepetitions);
+                        
+            for repIdx = 1:numRepetitions
+                outputThisRep = obj.execute(fcData,behavior,groupIds); 
+                resultObj.setOutputAtRepetitionIndex(outputThisRep, repIdx);
+            end
             
+            outputAllReps = resultObj.asStruct();
+            avgOutput = resultObj.avgAsStruct(); 
+                                                    
         end
         
         function obj = set.testDataFraction(obj, val)
@@ -105,5 +101,6 @@ classdef MLCrossVal
         end
         
     end
+    
     
 end
