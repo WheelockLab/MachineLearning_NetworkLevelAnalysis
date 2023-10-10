@@ -19,9 +19,48 @@ sibIds = ceil(rand(numSubj,1)*numSibGroups);
 mlCrossVal = mlnla.MLCrossVal();
 mlCrossVal.testDataFraction = 0.2;
 
-%% Run ML single permutation
+%% If you want to filter FC edges, use the following:
+FILTER_KEEP_HIGHEST_CORR_EDGES = false;
+if FILTER_KEEP_HIGHEST_CORR_EDGES
+    numEdgesToKeep = 1000;
+    mlCrossVal.featureFilter = mlnla.featurefilter.HighestCorr(numEdgesToKeep);
+else
+    mlCrossVal.featureFilter = mlnla.featurefilter.Null(); %This is Default
+end
+
+%% If you want to change how test/train data is split up, use the following:
+IGNORE_GROUPS = false;
+if IGNORE_GROUPS
+    mlCrossVal.trainTestDataSplitter = mlnla.traintestdatasplitter.IgnoreGroups();
+else
+    mlCrossVal.trainTestDataSplitter = mlnla.traintestdatasplitter.MaintainGroups(); %This is Default
+end
+
+%% Run ML single repetition
 output = mlCrossVal.execute(flatFcData, age, sibIds);
 
 %% Run ML n times and get outputs per repetition and avg outputs
-numRepetitions = 10;
+numRepetitions = 4;
 [outputPerRep, avgOutput] = mlCrossVal.executeNTimes(flatFcData,age,sibIds,numRepetitions);
+
+%% Run ML with different kinds of permutation
+%permute behavior only
+permuteBehaviorFlag = true;
+[outputPerRep, avgOutput] = mlCrossVal.executeNTimesPermuted(flatFcData,age,sibIds,numRepetitions,permuteBehaviorFlag,false);
+
+
+%permute both behavior and net pairs
+%Define the IM_key that will be used for net pair permutation, and apply it
+%to the mlCrossVal object
+numROIs = 333;
+ROI_idx = (1:numROIs)';
+numNets = 4; %arbitrary for this example
+ROI_net_id = ceil(rand(numROIs,1)*4); 
+IM_key = [ROI_idx, ROI_net_id];
+mlCrossVal.setIMKeyForNetPairPermutation(IM_key);
+
+%Run with both permutation of behavior and net-pair
+permuteBehaviorFlag = true;
+permuteNetPairFlag = true;
+[outputPerRep, avgOutput] = mlCrossVal.executeNTimesPermuted(flatFcData,age,sibIds,numRepetitions,permuteBehaviorFlag,permuteNetPairFlag);
+

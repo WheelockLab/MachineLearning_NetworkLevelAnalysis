@@ -1,4 +1,4 @@
-classdef MLCrossVal
+classdef MLCrossVal < handle
     
     properties
         testDataFraction
@@ -7,6 +7,11 @@ classdef MLCrossVal
         trainTestDataSplitter mlnla.traintestdatasplitter.Base = mlnla.traintestdatasplitter.MaintainGroups()
         featureFilter mlnla.featurefilter.Base = mlnla.featurefilter.Null()
         
+    end
+    
+    properties (Access = protected)
+        behavPermMethod = mlnla.permutation.Behavior()
+        netPairPermMethod = mlnla.permutation.Null()
     end
         
     methods
@@ -81,9 +86,31 @@ classdef MLCrossVal
                                                                     permuteBehavFlag, permuteNetPairsFlag)
                                                     
             resultObj = mlnla.MLRepeatedResult(numRepetitions);
+            
+            if permuteNetPairsFlag
+                isInit = obj.isNetPairPermObjectInitialized();
+                if ~isInit
+                    errorStr = sprintf([['Called MLCrossVal to run with permuted net pairs, '],...
+                                        ['but did not provide an IM_key for net-pair assignments of ROIs.\n'],...
+                                        ['To run with net-pair permutation, get an IM_key corresponding to your FC data, '],...
+                                        ['and call method "setIMKeyForNetPairPermutation(IM_key)" on your MLCrossVal object']]);
+                    error(errorStr);
+                end
+            end
                         
             for repIdx = 1:numRepetitions
-                outputThisRep = obj.execute(fcData,behavior,groupIds); 
+                if permuteBehavFlag
+                    thisBehavior = obj.behavPermMethod.permute(behavior);
+                else
+                    thisBehavior = behavior;
+                end
+                if permuteNetPairsFlag
+                    thisFcData = obj.netPairPermMethod.permute(fcData);
+                else
+                    thisFcData = fcData;
+                end
+                
+                outputThisRep = obj.execute(thisFcData,thisBehavior,groupIds); 
                 resultObj.setOutputAtRepetitionIndex(outputThisRep, repIdx);
             end
             
@@ -100,6 +127,24 @@ classdef MLCrossVal
             obj.testDataFraction = val;
         end
         
+        function setIMKeyForNetPairPermutation(obj, IM_key)
+            obj.netPairPermMethod = mlnla.permutation.NetPairs(IM_key);            
+        end
+        
+    end
+    
+    methods (Access = protected)
+
+        function isInit = isNetPairPermObjectInitialized(obj)
+            
+            if isa(obj.netPairPermMethod,'mlnla.permutation.Null')
+                isInit = false;
+            else
+                isInit = true;
+            end
+            
+        end
+
     end
     
     
