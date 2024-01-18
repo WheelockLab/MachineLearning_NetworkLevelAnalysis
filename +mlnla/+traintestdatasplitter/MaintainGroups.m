@@ -21,7 +21,7 @@ classdef MaintainGroups < mlnla.traintestdatasplitter.Base
                         '(test set: %i groups, train set: %i groups'], testDataFraction, numGroupsInTest, numGroupsInTrain);
             end
 
-            groupIdsInTest = randperm(numGroups, numGroupsInTest);
+            groupIdsInTest = unqGroups(randperm(numGroups, numGroupsInTest));
             allIdxs = (1:numSubjects)';
 
             testIdxs = [];
