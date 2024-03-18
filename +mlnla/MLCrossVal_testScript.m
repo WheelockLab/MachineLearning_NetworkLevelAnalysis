@@ -36,6 +36,21 @@ else
     mlCrossVal.trainTestDataSplitter = mlnla.traintestdatasplitter.MaintainGroups(); %This is Default
 end
 
+%% If you want to use a K Fold model rather than the default, using the following
+USE_K_FOLD = true;
+if USE_K_FOLD
+    kFoldModelFitter = mlnla.tuningmodelfitter.KFoldLinearModel();
+    %kFoldModelFitter.epsilon = 0.1;
+    %kFoldModelFitter.KFolds = 5;
+    %kFoldModelFitter.lambda = logspace(-5, -1, 15);
+    mlCrosVal.tuningModelFitter = kFoldModelFitter;
+else
+    %This is what happens by default
+     svrModelFitter = mlnla.tuningmodelfitter.SVRLinearModel();
+     svrModelFitter.epsilon = 0.2;%can change default epsilon value used by model
+     mlCrossVal.tuningModelFitter = svrModelFitter;
+end
+
 %% Run ML single repetition
 output = mlCrossVal.execute(flatFcData, age, sibIds);
 

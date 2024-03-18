@@ -6,6 +6,7 @@ classdef MLCrossVal < handle
         
         trainTestDataSplitter mlnla.traintestdatasplitter.Base = mlnla.traintestdatasplitter.MaintainGroups()
         featureFilter mlnla.featurefilter.Base = mlnla.featurefilter.Null()
+        tuningModelFitter mlnla.tuningmodelfitter.Base = mlnla.tuningmodelfitter.SVRLinearModel()
         
     end
     
@@ -40,7 +41,8 @@ classdef MLCrossVal < handle
 
             %This line should be flexible to accomodate lasso,
             %fitrlinear
-            fitSVRLinear = fitrlinear(fcTrain', behavTrain, 'ObservationsIn','columns','Epsilon',obj.svrBandwidth);
+            
+            fitSVRLinear = obj.tuningModelFitter.fitModel(fcTrain, behavTrain);
             output.betaFit = fitSVRLinear.Beta;
 
             behavPrediction = predict(fitSVRLinear,fcTest','ObservationsIn','columns');
