@@ -4,7 +4,7 @@ classdef KFoldLinearModel < mlnla.tuningmodelfitter.Base
         
         epsilon = 0.1
         KFolds = 5;
-        lambda = logspace(-5, -1, 15)
+        lambdaTestSet = logspace(-5, -1, 15)
         
     end
     
@@ -17,12 +17,12 @@ classdef KFoldLinearModel < mlnla.tuningmodelfitter.Base
             
             tuning_para_Mdl = fitrlinear(xTrainData,yTrainData,...
                 'KFold',obj.KFolds,...
-                'Lambda',obj.lambda,...
+                'Lambda',obj.lambdaTestSet,...
                 'Learner','svm','Solver','sgd','Regularization','ridge');
             
             tuning_para_MSE = kfoldLoss(tuning_para_Mdl);
             [~,optimal_lambda_idx] = min(tuning_para_MSE);
-            optimal_lambda = obj.lambda(optimal_lambda_idx);
+            optimal_lambda = obj.lambdaTestSet(optimal_lambda_idx);
 
             outModel = fitrlinear(xTrainData,yTrainData,'Epsilon',obj.epsilon,'Lambda',optimal_lambda);
             

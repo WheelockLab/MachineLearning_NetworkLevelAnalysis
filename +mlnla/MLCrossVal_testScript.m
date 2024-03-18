@@ -39,16 +39,22 @@ end
 %% If you want to use a K Fold model rather than the default, using the following
 USE_K_FOLD = true;
 if USE_K_FOLD
+    
     kFoldModelFitter = mlnla.tuningmodelfitter.KFoldLinearModel();
-    %kFoldModelFitter.epsilon = 0.1;
-    %kFoldModelFitter.KFolds = 5;
-    %kFoldModelFitter.lambda = logspace(-5, -1, 15);
+    kFoldModelFitter.epsilon = 0.15; % <- default value, but user can change
+    kFoldModelFitter.KFolds = 6; % <- default value, but user can change
+    kFoldModelFitter.lambdaTestSet = logspace(-5, -1, 10); % <- default value, but user can change
+    
     mlCrosVal.tuningModelFitter = kFoldModelFitter;
 else
-    %This is what happens by default
-     svrModelFitter = mlnla.tuningmodelfitter.SVRLinearModel();
-     svrModelFitter.epsilon = 0.2;%can change default epsilon value used by model
-     mlCrossVal.tuningModelFitter = svrModelFitter;
+    %This is what happens by default, so don't need to call any of these
+    %lines when building new model. Just for traceability to change back
+    %and forth between this and KFold modelfitter
+    
+     %svrModelFitter = mlnla.tuningmodelfitter.SVRLinearModel();
+     %svrModelFitter.epsilon = 0.1; % <- default value, but user can change
+     
+     %mlCrossVal.tuningModelFitter = svrModelFitter;
 end
 
 %% Run ML single repetition
