@@ -43,9 +43,9 @@ if USE_K_FOLD
     kFoldModelFitter = mlnla.tuningmodelfitter.KFoldLinearModel();
     kFoldModelFitter.epsilon = 0.15; % <- default value, but user can change
     kFoldModelFitter.KFolds = 6; % <- default value, but user can change
-    kFoldModelFitter.lambdaTestSet = logspace(-5, -1, 10); % <- default value, but user can change
+    kFoldModelFitter.lambdaTestSet = logspace(-5, -1, 15); % <- default value, but user can change
     
-    mlCrosVal.tuningModelFitter = kFoldModelFitter;
+    mlCrossVal.tuningModelFitter = kFoldModelFitter;
 else
     %This is what happens by default, so don't need to call any of these
     %lines when building new model. Just for traceability to change back
@@ -67,7 +67,8 @@ numRepetitions = 4;
 %% Run ML with different kinds of permutation
 %permute behavior only
 permuteBehaviorFlag = true;
-[outputPerRep, avgOutput] = mlCrossVal.executeNTimesPermuted(flatFcData,age,sibIds,numRepetitions,permuteBehaviorFlag,false);
+permuteNetPairsFlag = false;
+[outputPerRep, avgOutput] = mlCrossVal.executeNTimesPermuted(flatFcData,age,sibIds,numRepetitions,permuteBehaviorFlag,permuteNetPairsFlag);
 
 
 %permute both behavior and net pairs
